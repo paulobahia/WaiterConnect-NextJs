@@ -1,0 +1,59 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url = "mongodb+srv://Verde:xRnabqa3vuQyHIIc@sinalverde.hbioay3.mongodb.net/SinalVerde"
+}
+
+model User {
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  email       String?    @unique
+  password    String
+  type        Role       @default(WAITER)
+  createdAt   DateTime   @default(now())
+  order       Order[]
+}
+
+model Category {
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  icon        String
+  products    Products[]
+}
+
+model Products {
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String
+  price       Int
+  ingredients Json?
+  category    Category   @relation(fields: [categoryId], references: [id])
+  categoryId  String     @unique @db.ObjectId
+}
+
+model Order {
+  id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  table       String
+  status      Status
+  products    Json       
+  user        User       @relation(fields: [userId], references: [id])
+  userId      String     @unique @db.ObjectId
+  createdAt   DateTime   @default(now())
+}
+
+enum Role {
+  ADMIN
+  WAITER
+  KITCHEN
+  USER
+}
+
+enum Status {
+  WAITING
+  CONFIRMED
+  IN_PRODUCTION
+  DONE
+}
