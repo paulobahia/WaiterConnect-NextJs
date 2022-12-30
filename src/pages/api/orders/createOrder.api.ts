@@ -1,0 +1,25 @@
+import { NextApiRequest, NextApiResponse } from "next";
+import { prisma } from "../../../lib/prisma";
+
+export default async function handler(
+    req: NextApiRequest,
+    res: NextApiResponse, 
+)   
+
+{
+    if (req.method !== 'POST'){
+      return res.status(405).end()
+    }
+    const { table, status, productsId, userId, quantity } = req.body
+    const order = await prisma.order.create({
+      data: {
+        table,
+        status,
+        productsId,
+        quantity,
+        userId,
+      },
+    })
+
+    res.json(order)
+}

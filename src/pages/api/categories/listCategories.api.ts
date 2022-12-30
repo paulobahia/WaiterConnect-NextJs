@@ -1,7 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "../../../lib/prisma";
 
-
 export default async function handler(
     req: NextApiRequest,
     res: NextApiResponse, 
@@ -11,16 +10,7 @@ export default async function handler(
       return res.status(405).end()
     }
 
-    const user = await prisma.user.findMany({
-      select: {
-        id:true,
-        name:true,
-        email:true,
-        type:true,
-        password: false
-      }
-    })
+    const category = await prisma.category.findMany({})
 
-    res.json(user)
+    res.json(category)
     }
-    
