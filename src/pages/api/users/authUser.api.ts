@@ -1,40 +1,52 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "../../../lib/prisma";
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken'
 
 export default async function handler(
-    req: NextApiRequest,
-    res: NextApiResponse, 
-)   {
+  req: NextApiRequest,
+  res: NextApiResponse,
+) {
 
-    if (req.method !== 'GET'){
-      return res.status(405).end()
-    }
-    const { email, password }  = req.body
+  const Secret = process.env.SECRET
 
-    const user = await prisma.user.findUnique({
-      where: {
-          email
-      }
-    })
+  if (req.method !== 'GET') {
+    return res.status(405).end()
+  }
+  const { email, password } = req.body
 
-    if (!user) {
-      return res.status(400).json({
-        error: 'User not registered',
-      });
-    }
+  const user = await prisma.user.findUnique({
+    where: {
+      email
+    },
+  })
 
-    const checkPassword = bcrypt.compareSync(password, user.password)
+  if (!user) {
+    return res.status(400).json({
+      error: 'User not registered',
+    });
+  }
 
-    if (checkPassword){
-      return res.status(204).end()
-    }
-    else{
-      return res.status(401).json({
-        error: 'Email address or password not valid',
-      });
-    }
-    
+  const checkPassword = bcrypt.compareSync(password, user.password)
 
-    }
-    
+  if (!checkPassword) {
+    return res.status(401).json({
+      error: 'Email address or password not valid',
+    });
+  }
+
+  try {
+
+    const token = jwt.sign({
+      id: user.id,
+    }, Secret as string)
+
+    res.status(200).json({token})
+
+  } catch (e) {
+    console.log(e)
+  }
+
+
+}
+
