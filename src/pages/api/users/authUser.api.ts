@@ -41,7 +41,9 @@ export default async function handler(
       id: user.id,
     }, Secret as string)
 
-    res.status(200).json({token})
+    res.status(200).json({
+      token, user
+    })
 
   } catch (e) {
     console.log(e)
