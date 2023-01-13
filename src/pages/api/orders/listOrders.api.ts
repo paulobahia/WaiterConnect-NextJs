@@ -1,3 +1,4 @@
+import { groupBy } from "lodash";
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "../../../lib/prisma";
 
@@ -12,8 +13,12 @@ export default async function handler(
 
     const order = await prisma.order.findMany({
       include:{
-        products:true
-      }
+        orderProducts:{
+          include:{
+            products: true
+          }
+        }
+      },
     })
 
     res.json(order)

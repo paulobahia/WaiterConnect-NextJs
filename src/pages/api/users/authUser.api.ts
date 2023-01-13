@@ -39,10 +39,13 @@ export default async function handler(
 
     const token = jwt.sign({
       id: user.id,
+      name: user.name,
+      email: user.email,
+      type: user.type
     }, Secret as string)
 
     res.status(200).json({
-      token, user
+      token
     })
 
   } catch (e) {

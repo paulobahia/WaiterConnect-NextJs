@@ -17,7 +17,7 @@ export default async function handler(
     });
   }
 
-  if (password > 8) {
+  if (password < 8) {
     return res.status(400).json({
       error: 'Password must be at least 8 characters long',
     });

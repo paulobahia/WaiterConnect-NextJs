@@ -10,15 +10,14 @@ export default async function handler(
     if (req.method !== 'POST'){
       return res.status(405).end()
     }
-    const { orderId, productsId, quantity } = req.body
+    const { table, status } = req.body
 
-    const orderProducts = await prisma.orderProducts.create({
+    const Order = await prisma.order.create({
       data: {
-        quantity,
-        productsId,
-        orderId
+        table,
+        status,
       },
     })
 
-    res.json(orderProducts)
+    res.json(Order)
 }
