@@ -1,8 +1,17 @@
 import catchAsyncErrors from "../middleware/catchAsyncErrors";
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "../lib/prisma";
+import { z } from "zod";
 
-const getAllProducts = catchAsyncErrors(async (req: NextApiRequest, res: NextApiResponse) => {
+const ProductsSchema = z.object({
+    name: z.string(),
+    description: z.string().max(59),
+    price: z.number(),
+    ingredients: z.union([z.string(), z.number(), z.boolean(), z.null()]).optional(), // Json Type
+    categoryId: z.string()
+})
+
+const AllProducts = catchAsyncErrors(async (req: NextApiRequest, res: NextApiResponse) => {
 
     const products = await prisma.products.findMany({
         include: {
@@ -14,9 +23,9 @@ const getAllProducts = catchAsyncErrors(async (req: NextApiRequest, res: NextApi
 
 });
 
-const postProducts = catchAsyncErrors(async (req: NextApiRequest, res: NextApiResponse) => {
+const createProducts = catchAsyncErrors(async (req: NextApiRequest, res: NextApiResponse) => {
 
-    const { name, description, price, ingredients, categoryId } = req.body
+    const { name, description, price, ingredients, categoryId } = ProductsSchema.parse(req.body)
     const products = await prisma.products.create({
         data: {
             name,
@@ -31,4 +40,4 @@ const postProducts = catchAsyncErrors(async (req: NextApiRequest, res: NextApiRe
 
 });
 
-export { getAllProducts, postProducts }
+export { AllProducts, createProducts }

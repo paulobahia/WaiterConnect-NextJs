@@ -1,9 +1,9 @@
 import nc from "next-connect";
 import onError from "../../../middleware/errors";
-import { postOrderId } from "../../../controllers/OrdersControllers";
+import { createOrderId } from "../../../controllers/OrdersControllers";
 
 const handler = nc({ onError });
 
-handler.post(postOrderId);
+handler.post(createOrderId);
 
 export default handler;

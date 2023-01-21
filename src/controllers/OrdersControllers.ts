@@ -1,10 +1,26 @@
 import catchAsyncErrors from "../middleware/catchAsyncErrors";
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "../lib/prisma";
+import { z } from "zod";
 
-const getAllOrders = catchAsyncErrors(async (req: NextApiRequest, res: NextApiResponse) => {
+const VALUES = ['WAITING', 'CONFIRMED', 'IN_PRODUCTION', 'DONE'] as const;
+const OrderSchema = z.object({
+    table: z.string(),
+    status: z.enum(VALUES)
+})
+
+const OrderProductsSchema = z.object({
+    quantity: z.number(),
+    productsId: z.string(),
+    orderId: z.string()
+})
+
+const AllOrders = catchAsyncErrors(async (req: NextApiRequest, res: NextApiResponse) => {
 
     const order = await prisma.order.findMany({
+        orderBy: {
+            createdAt: "asc"
+        },
         include: {
             orderProducts: {
                 include: {
@@ -18,14 +34,14 @@ const getAllOrders = catchAsyncErrors(async (req: NextApiRequest, res: NextApiRe
 
 });
 
-const postOrderId = catchAsyncErrors(async (req: NextApiRequest, res: NextApiResponse) => {
+const createOrderId = catchAsyncErrors(async (req: NextApiRequest, res: NextApiResponse) => {
 
-    const { table, status } = req.body
+    const { table, status } = OrderSchema.parse(req.body)
 
     const Order = await prisma.order.create({
         data: {
             table,
-            status,
+            status
         },
     })
 
@@ -33,9 +49,9 @@ const postOrderId = catchAsyncErrors(async (req: NextApiRequest, res: NextApiRes
 
 });
 
-const postOrder = catchAsyncErrors(async (req: NextApiRequest, res: NextApiResponse) => {
+const createOrder = catchAsyncErrors(async (req: NextApiRequest, res: NextApiResponse) => {
 
-    const { orderId, productsId, quantity } = req.body
+    const { orderId, productsId, quantity } = OrderProductsSchema.parse(req.body)
 
     const orderProducts = await prisma.orderProducts.create({
         data: {
@@ -87,5 +103,4 @@ const cancelOrder = catchAsyncErrors(async (req: NextApiRequest, res: NextApiRes
 
 });
 
-
-export { getAllOrders, postOrderId, postOrder, changeOrder, cancelOrder }
+export { AllOrders, createOrderId, createOrder, changeOrder, cancelOrder }

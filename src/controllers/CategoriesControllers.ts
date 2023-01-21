@@ -1,15 +1,19 @@
 import catchAsyncErrors from "../middleware/catchAsyncErrors";
 import { NextApiRequest, NextApiResponse } from "next";
 import { prisma } from "../lib/prisma";
+import { z } from "zod";
 
-const getAllCategories = catchAsyncErrors(async (req: NextApiRequest, res: NextApiResponse) => {
+const CategoiesSchema = z.object({
+    name: z.string()
+})
 
+const AllCategories = catchAsyncErrors(async (req: NextApiRequest, res: NextApiResponse) => {
     const category = await prisma.category.findMany({})
 
     res.json(category)
 });
 
-const getProductsByCategory = catchAsyncErrors(async (req: NextApiRequest, res: NextApiResponse) => {
+const ProductsByCategory = catchAsyncErrors(async (req: NextApiRequest, res: NextApiResponse) => {
     const { categoryId } = req.body
 
     const products = await prisma.products.findMany({
@@ -22,8 +26,8 @@ const getProductsByCategory = catchAsyncErrors(async (req: NextApiRequest, res: 
 
 });
 
-const postCategories = catchAsyncErrors(async (req: NextApiRequest, res: NextApiResponse) => {
-    const { name } = req.body
+const createCategories = catchAsyncErrors(async (req: NextApiRequest, res: NextApiResponse) => {
+    const { name } = CategoiesSchema.parse(req.body)
 
     const category = await prisma.category.create({
         data: {
@@ -35,5 +39,4 @@ const postCategories = catchAsyncErrors(async (req: NextApiRequest, res: NextApi
 
 });
 
-
-export { getAllCategories, postCategories, getProductsByCategory }
+export { AllCategories, createCategories, ProductsByCategory }

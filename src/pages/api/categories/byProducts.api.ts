@@ -1,9 +1,9 @@
 import nc from "next-connect";
 import onError from "../../../middleware/errors";
-import { getProductsByCategory } from "../../../controllers/CategoriesControllers";
+import { ProductsByCategory } from "../../../controllers/CategoriesControllers";
 
 const handler = nc({ onError });
 
-handler.post(getProductsByCategory)
+handler.post(ProductsByCategory)
 
 export default handler;

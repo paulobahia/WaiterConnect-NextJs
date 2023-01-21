@@ -1,10 +1,18 @@
-import catchAsyncErrors from "../middleware/catchAsyncErrors";
 import { NextApiRequest, NextApiResponse } from "next";
-import { prisma } from "../lib/prisma";
+import { z } from "zod";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken'
 
-const getAllUsers = catchAsyncErrors(async (req: NextApiRequest, res: NextApiResponse) => {
+import catchAsyncErrors from "../middleware/catchAsyncErrors";
+import { prisma } from "../lib/prisma";
+
+const UserSchema = z.object({
+    name: z.string({ required_error: "Name is required", invalid_type_error: "Name must be a string", }),
+    email: z.string().email({ message: "Invalid email address" }),
+    password: z.string().min(8, { message: "Password must be at least 8 characters long" })
+})
+
+const AllUsers = catchAsyncErrors(async (req: NextApiRequest, res: NextApiResponse) => {
 
     const user = await prisma.user.findMany({
         select: {
@@ -19,26 +27,8 @@ const getAllUsers = catchAsyncErrors(async (req: NextApiRequest, res: NextApiRes
 
 });
 
-const postUsers = catchAsyncErrors(async (req: NextApiRequest, res: NextApiResponse) => {
-    const { name, email, password } = req.body
-
-    if (!name) {
-        return res.status(400).json({
-            error: 'Name is required',
-        });
-    }
-
-    if (password < 8) {
-        return res.status(400).json({
-            error: 'Password must be at least 8 characters long',
-        });
-    }
-
-    if (!email) {
-        return res.status(400).json({
-            error: 'Email is required',
-        });
-    }
+const createUsers = catchAsyncErrors(async (req: NextApiRequest, res: NextApiResponse) => {
+    const { name, email, password } = UserSchema.parse(req.body)
 
     if (await prisma.user.findUnique({
         where: {
@@ -56,7 +46,7 @@ const postUsers = catchAsyncErrors(async (req: NextApiRequest, res: NextApiRespo
         data: {
             name,
             email,
-            password
+            password: passwordHash
         }
     })
 
@@ -106,5 +96,4 @@ const authUser = catchAsyncErrors(async (req: NextApiRequest, res: NextApiRespon
     }
 })
 
-
-export { getAllUsers, postUsers, authUser }
+export { AllUsers, createUsers, authUser }

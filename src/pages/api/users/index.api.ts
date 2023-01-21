@@ -1,10 +1,10 @@
 import nc from "next-connect";
 import onError from "../../../middleware/errors";
-import { getAllUsers, postUsers } from "../../../controllers/UsersControllers";
+import { AllUsers, createUsers } from "../../../controllers/UsersControllers";
 
 const handler = nc({ onError });
 
-handler.get(getAllUsers);
-handler.post(postUsers);
+handler.get(AllUsers);
+handler.post(createUsers);
 
 export default handler;
