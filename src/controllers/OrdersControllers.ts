@@ -6,7 +6,7 @@ import { z } from "zod";
 const VALUES = ['WAITING', 'CONFIRMED', 'IN_PRODUCTION', 'DONE'] as const;
 const OrderSchema = z.object({
     table: z.string(),
-    status: z.enum(VALUES)
+    status: z.enum(VALUES).optional()
 })
 
 const OrderProductsSchema = z.object({

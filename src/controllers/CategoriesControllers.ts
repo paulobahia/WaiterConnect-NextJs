@@ -4,7 +4,8 @@ import { prisma } from "../lib/prisma";
 import { z } from "zod";
 
 const CategoiesSchema = z.object({
-    name: z.string()
+    name: z.string(),
+    icon: z.string()
 })
 
 const AllCategories = catchAsyncErrors(async (req: NextApiRequest, res: NextApiResponse) => {
@@ -27,11 +28,12 @@ const ProductsByCategory = catchAsyncErrors(async (req: NextApiRequest, res: Nex
 });
 
 const createCategories = catchAsyncErrors(async (req: NextApiRequest, res: NextApiResponse) => {
-    const { name } = CategoiesSchema.parse(req.body)
+    const { name, icon } = CategoiesSchema.parse(req.body)
 
     const category = await prisma.category.create({
         data: {
             name,
+            icon
         },
     })
 

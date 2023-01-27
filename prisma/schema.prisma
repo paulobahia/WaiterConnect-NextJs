@@ -18,6 +18,7 @@ model User {
 
 model Category {
   id          String     @id @default(auto()) @map("_id") @db.ObjectId
+  icon        String
   name        String
   products    Products[]
 }
@@ -26,6 +27,7 @@ model Products {
   id          String     @id @default(auto()) @map("_id") @db.ObjectId
   name        String
   description String
+  imagePath   String
   price       Int
   ingredients Json?
   category    Category   @relation(fields: [categoryId], references: [id])
