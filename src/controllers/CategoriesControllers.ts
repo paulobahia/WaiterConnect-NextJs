@@ -14,6 +14,25 @@ const AllCategories = catchAsyncErrors(async (req: NextApiRequest, res: NextApiR
     res.json(category)
 });
 
+const AllCategoriesandProducts = catchAsyncErrors(async (req: NextApiRequest, res: NextApiResponse) => {
+    const category = await prisma.category.findMany({
+        include:{
+            products:{
+                select:{
+                    id: true,
+                    name: true,
+                    imagePath: true,
+                    price: true,
+                    description: true,
+                    ingredients: true,
+                }
+            }
+        }
+    })
+
+    res.json(category)
+});
+
 const ProductsByCategory = catchAsyncErrors(async (req: NextApiRequest, res: NextApiResponse) => {
     const { categoryId } = req.body
 
@@ -41,4 +60,4 @@ const createCategories = catchAsyncErrors(async (req: NextApiRequest, res: NextA
 
 });
 
-export { AllCategories, createCategories, ProductsByCategory }
+export { AllCategories, createCategories, ProductsByCategory, AllCategoriesandProducts }

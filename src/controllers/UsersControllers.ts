@@ -19,7 +19,6 @@ const AllUsers = catchAsyncErrors(async (req: NextApiRequest, res: NextApiRespon
             name: true,
             email: true,
             type: true,
-            password: false
         }
     })
 
