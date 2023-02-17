@@ -6,20 +6,18 @@ import jwt from 'jsonwebtoken'
 import catchAsyncErrors from "../middleware/catchAsyncErrors";
 import { prisma } from "../lib/prisma";
 
-const UserSchema = z.object({
+const AccountSchema = z.object({
     name: z.string({ required_error: "Name is required", invalid_type_error: "Name must be a string", }),
-    cpf: z.number().min(11, { message: "CPF invalid" }),
+    email: z.string().email({ message: "Invalid email address" }),
     password: z.string().min(8, { message: "Password must be at least 8 characters long" }),
-    accountId: z.string({ required_error: "AccountId is required"})
 })
 
-const AllUsers = catchAsyncErrors(async (req: NextApiRequest, res: NextApiResponse) => {
+const AllAccount = catchAsyncErrors(async (req: NextApiRequest, res: NextApiResponse) => {
 
-    const user = await prisma.user.findMany({
+    const user = await prisma.accounts.findMany({
         select: {
             name: true,
-            cpf: true,
-            type: true,
+            email: true,
         }
     })
 
@@ -27,12 +25,12 @@ const AllUsers = catchAsyncErrors(async (req: NextApiRequest, res: NextApiRespon
 
 });
 
-const createUsers = catchAsyncErrors(async (req: NextApiRequest, res: NextApiResponse) => {
-    const { name, cpf, password, accountId } = UserSchema.parse(req.body)
+const createAccount = catchAsyncErrors(async (req: NextApiRequest, res: NextApiResponse) => {
+    const { name, email, password } = AccountSchema.parse(req.body)
 
-    if (await prisma.user.findUnique({
+    if (await prisma.accounts.findUnique({
         where: {
-            cpf
+            email
         }
     })) {
         return res.status(400).json({
@@ -42,12 +40,11 @@ const createUsers = catchAsyncErrors(async (req: NextApiRequest, res: NextApiRes
 
     const passwordHash = await bcrypt.hash(password, 12)
 
-    const user = await prisma.user.create({
+    const user = await prisma.accounts.create({
         data: {
             name,
-            cpf,
+            email,
             password: passwordHash,
-            accountId
         }
     })
 
@@ -55,13 +52,13 @@ const createUsers = catchAsyncErrors(async (req: NextApiRequest, res: NextApiRes
 
 });
 
-const authUser = catchAsyncErrors(async (req: NextApiRequest, res: NextApiResponse) => {
+const authAccount = catchAsyncErrors(async (req: NextApiRequest, res: NextApiResponse) => {
     const Secret = process.env.SECRET
-    const { cpf, password } = req.body
+    const { email, password } = req.body
 
-    const user = await prisma.user.findUnique({
+    const user = await prisma.accounts.findUnique({
         where: {
-            cpf
+            email
         },
     })
 
@@ -84,7 +81,6 @@ const authUser = catchAsyncErrors(async (req: NextApiRequest, res: NextApiRespon
         const token = jwt.sign({
             id: user.id,
             name: user.name,
-            type: user.type
         }, Secret as string)
 
         res.status(200).json({
@@ -96,4 +92,4 @@ const authUser = catchAsyncErrors(async (req: NextApiRequest, res: NextApiRespon
     }
 })
 
-export { AllUsers, createUsers, authUser }
+export { AllAccount, createAccount, authAccount }

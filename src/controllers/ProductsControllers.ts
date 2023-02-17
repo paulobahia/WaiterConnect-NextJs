@@ -24,7 +24,7 @@ const AllProducts = catchAsyncErrors(async (req: NextApiRequest, res: NextApiRes
 });
 
 const createProducts = catchAsyncErrors(async (req: NextApiRequest, res: NextApiResponse) => {
-    const image = req.file?.filename
+    const imagePath = req.file?.filename
     const { name, description, price, ingredients, categoryId } = ProductsSchema.parse(req.body)
     const products = await prisma.products.create({
         data: {

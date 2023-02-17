@@ -5,7 +5,8 @@ import { z } from "zod";
 
 const VALUES = ['WAITING', 'CONFIRMED', 'IN_PRODUCTION', 'DONE'] as const;
 const OrderSchema = z.object({
-    table: z.string(),
+    tableId: z.string(),
+    userId: z.string(),
     status: z.enum(VALUES).optional()
 })
 
@@ -22,11 +23,23 @@ const AllOrders = catchAsyncErrors(async (req: NextApiRequest, res: NextApiRespo
             createdAt: "asc"
         },
         include: {
+            table: {
+                select:{
+                    status:true,
+                    number:true
+                }
+            },
+            user: {
+                select:{
+                    name: true,
+                    type: true,
+                }
+            },
             orderProducts: {
                 include: {
                     products: true
                 }
-            }
+            },
         },
     })
 
@@ -36,12 +49,12 @@ const AllOrders = catchAsyncErrors(async (req: NextApiRequest, res: NextApiRespo
 
 const createOrderId = catchAsyncErrors(async (req: NextApiRequest, res: NextApiResponse) => {
 
-    const { table, status } = OrderSchema.parse(req.body)
+    const { userId, tableId } = OrderSchema.parse(req.body)
 
     const Order = await prisma.order.create({
         data: {
-            table,
-            status
+            userId,
+            tableId
         },
     })
 
