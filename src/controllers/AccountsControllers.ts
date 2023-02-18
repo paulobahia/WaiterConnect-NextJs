@@ -92,4 +92,24 @@ const authAccount = catchAsyncErrors(async (req: NextApiRequest, res: NextApiRes
     }
 })
 
-export { AllAccount, createAccount, authAccount }
+const waiterByAccount = catchAsyncErrors(async (req: NextApiRequest, res: NextApiResponse) => {
+    const { accountId } = req.body
+
+    const waiters = await prisma.user.findMany({
+        where: {
+            accountId: accountId,
+            AND: {
+                type: 'WAITER'
+            }
+        },
+        select: {
+            id: true,
+            name: true,
+        }
+    })
+
+    res.json(waiters)
+
+});
+
+export { AllAccount, createAccount, authAccount, waiterByAccount }

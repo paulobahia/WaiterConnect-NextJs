@@ -1,9 +1,9 @@
 import nc from "next-connect";
 import onError from "../../../middleware/errors";
-import { authAccount } from "../../../controllers/AccountsControllers";
+import { waiterByAccount } from "../../../controllers/AccountsControllers";
 
 const handler = nc({ onError });
 
-handler.post(authAccount);
+handler.post(waiterByAccount);
 
 export default handler;
