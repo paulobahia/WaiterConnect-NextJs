@@ -4,6 +4,6 @@ import { authUser } from "../../../controllers/UsersControllers";
 
 const handler = nc({ onError });
 
-handler.get(authUser);
+handler.post(authUser);
 
 export default handler;

@@ -105,6 +105,7 @@ const waiterByAccount = catchAsyncErrors(async (req: NextApiRequest, res: NextAp
         select: {
             id: true,
             name: true,
+            cpf: true
         }
     })
 
