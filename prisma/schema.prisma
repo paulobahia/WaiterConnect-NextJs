@@ -22,6 +22,7 @@ model User {
   password    String
   cpf         Int        @unique
   type        Role       @default(WAITER)
+  avatar      String?
   createdAt   DateTime   @default(now())
   account     Accounts   @relation(fields: [accountId], references: [id])
   accountId   String     @db.ObjectId

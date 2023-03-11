@@ -28,6 +28,7 @@ const AllUsers = catchAsyncErrors(async (req: NextApiRequest, res: NextApiRespon
 });
 
 const createUsers = catchAsyncErrors(async (req: NextApiRequest, res: NextApiResponse) => {
+    const avatar = req.file?.filename
     const { name, cpf, password, accountId } = UserSchema.parse(req.body)
 
     if (await prisma.user.findUnique({
@@ -46,6 +47,7 @@ const createUsers = catchAsyncErrors(async (req: NextApiRequest, res: NextApiRes
         data: {
             name,
             cpf,
+            avatar,
             password: passwordHash,
             accountId
         }
@@ -84,7 +86,8 @@ const authUser = catchAsyncErrors(async (req: NextApiRequest, res: NextApiRespon
         const token = jwt.sign({
             id: user.id,
             name: user.name,
-            type: user.type
+            type: user.type,
+            avatar: user.avatar
         }, Secret as string)
 
         res.status(200).json({
@@ -95,5 +98,11 @@ const authUser = catchAsyncErrors(async (req: NextApiRequest, res: NextApiRespon
         console.log(e)
     }
 })
+
+export const config = {
+    api: {
+        bodyParser: false,
+    },
+};
 
 export { AllUsers, createUsers, authUser }
